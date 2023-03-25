@@ -2,5 +2,5 @@
 
 Instructions to build tesseract from source
 
-Current instructions
-> arm64_v8a
+Currently instructions for 
+> Android arm64_v8a
