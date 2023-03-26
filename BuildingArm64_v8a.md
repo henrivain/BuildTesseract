@@ -52,7 +52,7 @@ Each command to its own line
 SET INSTALL_DIR=[PathToRootFolder]/build
 SET NDK=[PathToRootFolder]/android-ndk-r25c
 SET TOOLCHAIN=%NDK%/toolchains/llvm/prebuilt/windows-x86_64
-SET PATH=%PATH%;%TOOLCHAIN%/bin;C:\Users\henri\Downloads\android_tools\platform-tools;
+SET PATH=%PATH%;%TOOLCHAIN%/bin;[PathToRootFolder]/platform-tools;
 ```
 
 Set targets
