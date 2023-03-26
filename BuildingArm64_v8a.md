@@ -4,7 +4,7 @@
 
 Using x86_64 Windows 11 as build platform
 
-This tutorial is based on [blog from 2021](https://bucket401.blogspot.com/2021/07/crosscompile-tesseract-for-android-on.html). I have added some more information about steps. I am new to using C/C++ and know very little about compiling them targetting other palforms, but this seems to work.
+This tutorial is based on [blog from 2021](https://bucket401.blogspot.com/2021/07/crosscompile-tesseract-for-android-on.html). I have added some more information about steps. I am new to using C/C++ and know very little about compiling them targetting other platforms, but this seems to work.
 
 ## Step 1: Download needed build tools
 
