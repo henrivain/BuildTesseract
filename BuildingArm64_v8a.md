@@ -2,9 +2,11 @@
 
 25.3.2023
 
-Using x86_64 Windows 11 as build platform
+x86_64 Windows 11 as build platform
 
-This tutorial is based on [blog from 2021](https://bucket401.blogspot.com/2021/07/crosscompile-tesseract-for-android-on.html). I have added some more information about steps. I am new to using C/C++ and know very little about compiling them targetting other platforms, but this seems to work.
+This tutorial is based on [blog from 2021](https://bucket401.blogspot.com/2021/07/crosscompile-tesseract-for-android-on.html). I have added some more information and changed a little how build targets are chosen.
+
+Currently this can generate Tesseract libraries that can be run on many Android architectures.
 
 ## Step 1: Download needed build tools
 
@@ -49,10 +51,10 @@ replace `[PathToRootFolder]` with your full root folder path
 Each command to its own line
 
 ```powershell
-SET INSTALL_DIR=[PathToRootFolder]/build
-SET NDK=[PathToRootFolder]/android-ndk-r25c
-SET TOOLCHAIN=%NDK%/toolchains/llvm/prebuilt/windows-x86_64
-SET PATH=%PATH%;%TOOLCHAIN%/bin;[PathToRootFolder]/platform-tools;
+SET INSTALL_DIR=[PathToRootFolder]\build
+SET NDK=[PathToRootFolder]\android-ndk-r25c
+SET TOOLCHAIN=%NDK%\toolchains\llvm\prebuilt\windows-x86_64
+SET PATH=%PATH%;%TOOLCHAIN%\bin;[PathToRootFolder]\platform-tools;
 ```
 
 Set targets
@@ -62,8 +64,8 @@ SET TARGET=aarch64-linux-android
 SET API=21
 SET ABI=arm64-v8a
 SET MINSDKVERSION=16
-SET CXX=%TOOLCHAIN%/bin/%TARGET%%API%-clang++
-SET CC=%TOOLCHAIN%/bin/%TARGET%%API%-clang
+SET CXX=%TOOLCHAIN%\bin\%TARGET%%API%-clang++
+SET CC=%TOOLCHAIN%\bin\%TARGET%%API%-clang
 ```
 
 ## Step 3: Build libpng
@@ -81,7 +83,7 @@ cd libpng
 ```powershell
 cmake -Bbuild -G"Unix Makefiles" ^
 -DHAVE_LD_VERSION_SCRIPT=OFF ^
--DCMAKE_TOOLCHAIN_FILE=%NDK%/build/cmake/android.toolchain.cmake ^
+-DCMAKE_TOOLCHAIN_FILE=%NDK%\build\cmake\android.toolchain.cmake ^
 -DANDROID_PLATFORM=android-21 ^
 -DCMAKE_MAKE_PROGRAM=%NDK%\prebuilt\windows-x86_64\bin\make.exe ^
 -DANDROID_TOOLCHAIN=clang ^
@@ -99,13 +101,13 @@ To install libpng to `INSTALL_DIR`, run inside libpng folder
 cmake --build build --config Release --target install
 ```
 
-## Step 4: Build leptonica
-
 ### Go back to root folder
 
 ```powershell
 cd ..
 ```
+
+## Step 4: Build leptonica
 
 ### Clone leptonica repository
 
@@ -126,16 +128,16 @@ cmake -Bbuild -G"Unix Makefiles" ^
 -DBUILD_PROG=OFF ^
 -DSW_BUILD=OFF ^
 -DBUILD_SHARED_LIBS=ON ^
--DPNG_LIBRARY=%INSTALL_DIR%/lib/libpng.so ^
+-DPNG_LIBRARY=%INSTALL_DIR%\lib\libpng.so ^
 -DPNG_PNG_INCLUDE_DIR=%INSTALL_DIR%\include ^
--DCMAKE_TOOLCHAIN_FILE=%NDK%/build/cmake/android.toolchain.cmake ^
+-DCMAKE_TOOLCHAIN_FILE=%NDK%\build\cmake\android.toolchain.cmake ^
 -DANDROID_PLATFORM=android-21 ^
 -DCMAKE_MAKE_PROGRAM=%NDK%\prebuilt\windows-x86_64\bin\make.exe ^
 -DANDROID_TOOLCHAIN=clang ^
 -DANDROID_ABI=arm64-v8a ^
 -DCMAKE_BUILD_TYPE=Release ^
 -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% ^
--DCMAKE_PREFIX_PATH=%INSTALL_DIR%;%INSTALL_DIR%/lib;%INSTALL_DIR%/include;%INSTALL_DIR%/lib/cmake
+-DCMAKE_PREFIX_PATH=%INSTALL_DIR%;%INSTALL_DIR%\lib;%INSTALL_DIR%\include;%INSTALL_DIR%\lib\cmake
 ```
 
 ### Install leptonica
@@ -146,15 +148,15 @@ Install leptonica to `INSTALL_DIR` using
 cmake --build build --config Release --target install
 ```
 
-## Step 5: Build Google cpu_features
-
-This package seems to be missing, so it needs to be build independently
-
 ### Go back to root
 
 ```powershell
 cd ..
 ```
+
+## Step 5: Build Google cpu_features
+
+This package seems to be missing, so it needs to be build independently
 
 ### Clone cpu_features repository
 
@@ -172,11 +174,11 @@ Run cmake
 
 ```powershell
 cmake -Bbuild -G"Unix Makefiles" ^
--DCMAKE_TOOLCHAIN_FILE=%NDK%/build/cmake/android.toolchain.cmake ^
+-DCMAKE_TOOLCHAIN_FILE=%NDK%\build\cmake\android.toolchain.cmake ^
 -DANDROID_PLATFORM=android-21 ^
 -DCMAKE_MAKE_PROGRAM=%NDK%\prebuilt\windows-x86_64\bin\make.exe ^
 -DANDROID_TOOLCHAIN=clang ^
--DANDROID_ABI="arm64-v8a"
+-DANDROID_ABI="arm64-v8a" ^
 -DCMAKE_BUILD_TYPE=Release ^
 -DCMAKE_PREFIX_PATH=%INSTALL_DIR% ^
 -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR%
@@ -190,13 +192,13 @@ Install cpu_features to `INSTALL_DIR` using
 cmake --build build --config Release --target install
 ```
 
-## Step 6: Build Tesseract
-
 ### Go back to root
 
 ```powershell
 cd ..
 ```
+
+## Step 6: Build Tesseract
 
 ### Clone tesseract ocr repository
 
@@ -217,12 +219,12 @@ cmake -Bbuild -G"Unix Makefiles" -DBUILD_TRAINING_TOOLS=OFF ^
 -DGRAPHICS_DISABLED=ON -DSW_BUILD=OFF -DOPENMP_BUILD=OFF ^
 -DBUILD_SHARED_LIBS=ON ^
 -DLeptonica_DIR=%INSTALL_DIR%\lib\cmake\leptonica ^
--DCMAKE_TOOLCHAIN_FILE=%NDK%/build/cmake/android.toolchain.cmake ^
+-DCMAKE_TOOLCHAIN_FILE=%NDK%\build\cmake\android.toolchain.cmake ^
 -DANDROID_PLATFORM=android-21 ^
 -DCMAKE_MAKE_PROGRAM=%NDK%\prebuilt\windows-x86_64\bin\make.exe ^
 -DANDROID_TOOLCHAIN=clang -DANDROID_ABI=arm64-v8a ^
 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% ^
--DCMAKE_PREFIX_PATH=%INSTALL_DIR%;%INSTALL_DIR%/lib;%INSTALL_DIR%/include;%INSTALL_DIR%/lib/cmake ^
+-DCMAKE_PREFIX_PATH=%INSTALL_DIR%;%INSTALL_DIR%\lib;%INSTALL_DIR%\include;%INSTALL_DIR%\lib\cmake ^
 -DCpuFeaturesNdkCompat_DIR=%INSTALL_DIR%\lib\cmake\CpuFeaturesNdkCompat
 ```
 
