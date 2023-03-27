@@ -32,6 +32,12 @@ Download Windows version from the website and unzip
 
 Download Windows version from the website and unzip
 
+### Install unzip (Optional)
+
+```
+winget install -e --id GnuWin32.UnZip
+```
+
 ## Step 2 Configure build environment
 
 ### Create new empty folder
