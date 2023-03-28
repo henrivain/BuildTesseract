@@ -1,4 +1,4 @@
-# Building Tesseract ocr for Android running processor architectures
+# Building [Tesseract ocr](https://github.com/tesseract-ocr) for Android running processor architectures
 
 27.3.2023
 
@@ -38,7 +38,7 @@ Download Windows version from the website and unzip
 winget install -e --id GnuWin32.UnZip
 ```
 
-## Step 2 Configure build environment
+## Step 2 Configure build environment-
 
 ### Create new empty folder
 
@@ -76,11 +76,11 @@ These variables define, what processor architecture you are building for. You ca
 |  Platform   | ABI (Application binary interface) | Target                   | APIs  |
 | :---------: | :--------------------------------: | ------------------------ | ----- |
 | Arm (64bit) |             arm64-v8a              | aarch64-linux-android    | 21-33 |
-| Arm (32bit) |            armeabi-v7a             | armv7a-linux-androideabi |       |
-| x86 (64bit) |                x86                 | i686-linux-android       |       |
-| x86 (32bit) |               x86-64               | x86_64-linux-android     |       |
+| Arm (32bit) |            armeabi-v7a             | armv7a-linux-androideabi | 19-33 |
+| x86 (64bit) |                x86                 | i686-linux-android       | 19-33 |
+| x86 (32bit) |               x86-64               | x86_64-linux-android     | 21-33 |
 
-Available APIs could have been changed after writing (27.3.2023). You can check them from folder inside NDK: `android-ndk-r25c\toolchains\llvm\prebuilt\windows-x86_64\bin`. Check the clang file names for available APIs.
+These APIs were available during the time of writing (28.3.2023), so they might have changed. You can check available ones from NDK subfolder: `android-ndk-r25c\toolchains\llvm\prebuilt\windows-x86_64\bin`. Check the clang file names for available APIs.
 
 You can change values to target your platform
 
