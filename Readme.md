@@ -17,3 +17,7 @@ Buildscripts for
 > Android x86_64  
 > Android x86  
 
+| Instructions for | File |
+| ----------- | ----------- |
+| Android arm64_v8a      | Title       |
+| Android arm_v7a   | Text        |
