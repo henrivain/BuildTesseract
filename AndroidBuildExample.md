@@ -1,4 +1,4 @@
-# Building [Tesseract ocr](https://github.com/tesseract-ocr) for Android devices using arm64 v8a architecture
+# Example of building [Tesseract ocr](https://github.com/tesseract-ocr) for Arm64_v8a following [Android build instruction](https://github.com/henrivain/BuildTesseract/blob/ecb7c7db419bcb9bc49f38ef4cfcbc33e87bd4c8/BuildingAndroidArchitectures.md)
 
 25.3.2023
 
