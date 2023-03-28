@@ -78,7 +78,7 @@ These variables define, what processor architecture you are building for. You ca
 | Arm (64bit) |             arm64-v8a              | aarch64-linux-android    | 21-33 |
 | Arm (32bit) |            armeabi-v7a             | armv7a-linux-androideabi | 19-33 |
 | x86 (64bit) |                x86                 | i686-linux-android       | 19-33 |
-| x86 (32bit) |               x86-64               | x86_64-linux-android     | 21-33 |
+| x86 (32bit) |               x86_64               | x86_64-linux-android     | 21-33 |
 
 These APIs were available during the time of writing (28.3.2023), so they might have changed. You can check available ones from NDK subfolder: `android-ndk-r25c\toolchains\llvm\prebuilt\windows-x86_64\bin`. Check the clang file names for available APIs.
 
