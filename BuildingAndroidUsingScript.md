@@ -1,4 +1,4 @@
-# Using provided build script
+# Using provided build script to build for Android
 
 You can find build scripts I have written in the repository `Scripts` folder
 
