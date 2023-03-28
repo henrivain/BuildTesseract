@@ -67,7 +67,7 @@ Now you should have folder structure like
 
 ## Step 3: Set enviroment variables
 
-These are enviroment variables that are only preserved during your current terminal session. If you close your terminal for some reson, you need to repeat this step.
+These are enviroment variables that are only preserved during your current terminal session. If you close your terminal for some reason, you need to repeat this step. Every command not ending in '`^`' goes to its own line. '`^`' defines that command continues in the next line.
 
 ### Set build targets
 
