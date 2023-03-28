@@ -6,7 +6,7 @@ Build platform: `Windows 11 64bit`
 
 Build Target: `Android`
 
-Target Architecture: `Arm_v8a (64bit), Arm_v7a (32bit), x86 (32bit), x86_64 (64bit)`
+Target Architectures: `Arm_v8a (64bit), Arm_v7a (32bit), x86 (32bit), x86_64 (64bit)`
 
 ## Step 1: Get required tools
 
