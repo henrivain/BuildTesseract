@@ -27,24 +27,51 @@ SET /P ISCORRECTINPUT="Is information correct? (Y/[N]) >"
 IF /I "%ISCORRECTINPUT%" NEQ "Y" GOTO END
 
 
-:: DOWNLOAD NDK
-if exist android-ndk-r25c\ (
-    echo android-ndk-r25c  already exist, no need to download.
+:: CONFIGURE SOME PATHS 
+SET ROOT=%cd%
+SET INSTALL_DIR=%ROOT%\build
+SET BATCH_DIR=%~dp0
+
+echo --------------------------
+echo Download Tools 
+echo --------------------------
+
+
+:: VALIDATE NDK
+:: FIND OR DOWNLOAD
+SET NDK=%ROOT%\android-ndk-r25c
+echo batch file at %BATCH_DIR%
+echo Check for NDK at %BATCH_DIR%\android-ndk-r25c
+echo Check for NDK at %cd%\android-ndk-r25c
+
+if exist "%BATCH_DIR%\android-ndk-r25c\"  (
+    :: NDK INSIDE BATCH FILE DIRECTORY, RESET PATH
+    SET NDK=%BATCH_DIR%android-ndk-r25c
+    echo android-ndk-r25c already exist, no need to download.
+) else if exist android-ndk-r25c\ (
+    :: FILE WAS FOUND ELSEWHERE, RESET PATH
+    echo NDK exist inside root folder, no need to download.
 ) else (
     echo --------------------------
     echo Download android ndk 
     echo --------------------------
 
     echo This might take a while
-    curl -o android-ndk-r25c .zip https://dl.google.com/android/repository/android-ndk-r25c-windows.zip || GOTO FAILED
+    curl -o android-ndk-r25c.zip https://dl.google.com/android/repository/android-ndk-r25c-windows.zip || GOTO FAILED
 
-    unzip android-ndk-r25c .zip || GOTO FAILED
+    unzip android-ndk-r25c.zip || GOTO FAILED
 )
 
+echo Check platform-tools location 
 
-:: DOWNLOAD PLATFORM TOOLS
-if exist platform-tools\ (
-    echo platform-tools already exist, no need to download.
+:: VALIDATE PLATFORM-TOOLS
+:: FIND OR DOWNLOAD
+if exist "%BATCH_DIR%\platform-tools\" (
+    :: PLATFORM-TOOLS INSIDE BATCH FILE DIRECTORY, RESET PATH
+    SET PLATFORM_TOOLS_PATH=%BATCH_DIR%\platform-tools
+    echo platform-tools found inside batch file directory, no need to download.
+) else if exist platform-tools\ (
+    echo platform-tools exist inside root folder, no need to download.
 ) else (
     echo --------------------------
     echo Download android platform tools
@@ -55,7 +82,6 @@ if exist platform-tools\ (
     unzip platform-tools.zip || GOTO FAILED
 )
 
-
 echo --------------------------
 echo Configure build
 echo --------------------------
@@ -65,13 +91,13 @@ echo "Start build"
 echo "Create folder \build"
 mkdir build 
 
+echo platform-tools at %PLATFORM_TOOLS_PATH%
+echo NDK at %NDK%
+
 :: Configure tool paths
 SET MINSDKVERSION=16
-SET ROOT=%cd%
-SET INSTALL_DIR=%ROOT%\build
-SET NDK=%ROOT%\android-ndk-r25c
 SET TOOLCHAIN=%NDK%\toolchains\llvm\prebuilt\windows-x86_64
-SET PATH=%PATH%;%TOOLCHAIN%\bin;%ROOT%\platform-tools;
+SET PATH=%PATH%;%TOOLCHAIN%\bin;%PLATFORM_TOOLS_PATH%;
 SET CXX=%TOOLCHAIN%\bin\%TARGET%%API%-clang++
 SET CC=%TOOLCHAIN%\bin\%TARGET%%API%-clang
 
