@@ -27,7 +27,7 @@ Select C/C++ tools when asked during the installation
 
 ## Step 2: Configure build environment
 
-These enviroment variables will be deleted after you close your console window, so you need to set them again, if you close your console.
+These enviroment variables will be deleted after you close your console window, so you need to set them again, if you close your console. Note that, you must add quotation marks around "" any path, that has spaces. (Example: "C:\root\my folder\myFiles")
 
 ### Create folder with name of your choice
 
@@ -49,7 +49,7 @@ SET PATH=%PATH%;%INSTALL_DIR%/bin
 ### Create tessdata folder for later
 
 ```powershell
-mkdir %INSTALL_DIR%/share/tesseract/tessdata
+mkdir "%INSTALL_DIR%\share\tesseract\tessdata"
 ```
 
 ### Initialize Visual Studio environment
@@ -63,9 +63,9 @@ call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build
 ### Set more enviroment variables
 
 ```powershell
-SET INCLUDE=%INCLUDE%;%INSTALL_DIR%/include
-SET LIBPATH=%LIBPATH%;%INSTALL_DIR%/lib
-SET TESSDATA_PREFIX=%INSTALL_DIR%/share/tesseract/tessdata
+SET INCLUDE=%INCLUDE%;%INSTALL_DIR%\include
+SET LIBPATH=%LIBPATH%;%INSTALL_DIR%\lib
+SET TESSDATA_PREFIX=%INSTALL_DIR%\share\tesseract\tessdata
 ```
 
 ## Download tessdata files
@@ -73,11 +73,11 @@ SET TESSDATA_PREFIX=%INSTALL_DIR%/share/tesseract/tessdata
 I am using tessdata from tessdata repository, but you can also use data from tessdata_best or tessdata_fast. Download tess files using
 
 ```powershell
-git clone https://github.com/tesseract-ocr/tessconfigs %TESSDATA_PREFIX%
+git clone https://github.com/tesseract-ocr/tessconfigs "%TESSDATA_PREFIX%"
 curl -L https://github.com/tesseract-ocr/tessdata/raw/master/eng.traineddata ^
-    --output %TESSDATA_PREFIX%\eng.traineddata
+    --output "%TESSDATA_PREFIX%\eng.traineddata"
 curl -L https://github.com/tesseract-ocr/tessdata/raw/master/osd.traineddata ^
-    --output %TESSDATA_PREFIX%\osd.traineddata
+    --output "%TESSDATA_PREFIX%\osd.traineddata"
 ```
 
 ## Install Zlib
@@ -148,7 +148,7 @@ cd ..
 ### Clone repository
 
 ```powershell
-git clone --depth 1 https://github.com/DanBloomberg/leptonica.git
+git clone https://github.com/DanBloomberg/leptonica.git
 ```
 
 ### Go inside folder
