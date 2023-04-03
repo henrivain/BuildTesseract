@@ -2,6 +2,8 @@
 
 Instructions to build tesseract from source.
 
+_This is a part of my journey in learning how to use native libraries with .NET MAUI._
+
 This repository contains information about how to build [Tesseract ocr](https://github.com/tesseract-ocr/tesseract) for different platforms from source. I needed Tesseract for my C# project, but wasn't able to find any good package for ocr that would run on Android. I haven't build C/C++ projects from source before, so I had some difficulties. When I finally found working instructions I gathered them here with some of my own thinking and fixing problems, like missing dependency. I also wrote a little script that can automatically build for Android. I hope this helps someone! I am still beginner with these build tools, so if there are any mistakes let me know!
 
 ## Instuctions
@@ -26,7 +28,8 @@ This repository contains information about how to build [Tesseract ocr](https://
 ## Available precompiled binaries
 
 All can be found inside `Binaries` folder
-All are build using newest available (No release) code from repositories. Newest Tesseract release at the time of writing is 5.3.0 (28.3.2023).  
+All are build using newest available (No release) code from repositories. Newest Tesseract release at the time of writing is 5.3.0 (28.3.2023).
+
 > Android Arm64_v8a  
 > Android Arm_v7a  
 > Android x86_64  
