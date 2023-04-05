@@ -56,14 +56,16 @@ if exist "%BATCH_DIR%\android-ndk-r25c\" (
     echo NDK exist inside batch file folder, no need to copy.
 ) else (
     mkdir android-ndk-r25c
-    copy x86\android-ndk-r25c android-ndk-r25c\ || echo Cannot copy NDK to root folder, it might already exist in it.
+    :: Copy ndk to batch file directory
+    xcopy x86\android-ndk-r25c android-ndk-r25c\ /h /i /c /k /e /r /y || echo Cannot copy NDK to root folder, it might already exist in it.
 )
 
 if exist "%BATCH_DIR%\platform-tools\" (
     echo platform-tools exist inside batch file folder, no need to copy.
 ) else (
     mkdir platform-tools
-    copy x86\platform-tools platform-tools\ || echo Cannot copy platform-tools to root folder, it might already exist in it
+    :: Copy platform tools to batch file directory
+    xcopy x86\platform-tools platform-tools\ /h /i /c /k /e /r /y || echo Cannot copy platform-tools to root folder, it might already exist in it
 )
 
 
