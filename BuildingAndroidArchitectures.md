@@ -44,7 +44,7 @@ winget install -e --id GnuWin32.UnZip
 
 ### Create new empty folder
 
-In this example I use name `root`
+In this example I use name `root`. These instuctions are expecting that you `do not have any spaces in your path` to root `folder`.
 
 ### Copy tools
 

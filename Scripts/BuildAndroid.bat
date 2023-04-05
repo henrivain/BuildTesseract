@@ -15,6 +15,7 @@ echo Build Tesseract ocr
 echo script by Henri Vainio
 :: SET target variables
 echo -------------------------------------------------------------
+echo Path to your root folder should not contain any spaces!
 echo Do you have unzip, curl, git and cmake installed? Are you inside empty folder?
 SET /P ISEMPTY="Y/[N] >"
 IF /I "%ISEMPTY%" NEQ "Y" GOTO END
