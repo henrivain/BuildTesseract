@@ -290,12 +290,16 @@ GOTO END
 
 
 :FAILED
-echo process failed!
-echo Exit
+echo Failed!
+echo BuildAndroid.bat failed!
+echo Exit, return 1
+
 EXIT /b 1
 
 :END 
 
-echo Exit
+echo Success!
+echo Finish BuildAndroid.bat
+echo Exit, return 0
 
 EXIT /b 0

@@ -47,14 +47,16 @@ CALL ..\BuildAndroid x86 || GOTO FAILED
 
 cd ..
 
+echo x86 ready
+echo Check if tools can be copied
 
 SET BATCH_DIR=%~dp0
 
-if exist "%BATCH_DIR%\android-ndk-r25c\"(
+if exist "%BATCH_DIR%\android-ndk-r25c\" (
     echo NDK exist inside batch file folder, no need to copy.
 ) else (
     mkdir android-ndk-r25c
-    copy x86\android-ndk-r25c android-ndk-r25c\  || echo Cannot copy NDK to root folder, it might already exist in it.
+    copy x86\android-ndk-r25c android-ndk-r25c\ || echo Cannot copy NDK to root folder, it might already exist in it.
 )
 
 if exist "%BATCH_DIR%\platform-tools\" (
@@ -63,9 +65,6 @@ if exist "%BATCH_DIR%\platform-tools\" (
     mkdir platform-tools
     copy x86\platform-tools platform-tools\ || echo Cannot copy platform-tools to root folder, it might already exist in it
 )
-
-
-
 
 
 echo ------------------------------
