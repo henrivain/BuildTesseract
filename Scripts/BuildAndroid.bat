@@ -130,6 +130,29 @@ cmake --build build --config Release --target install || GOTO FAILED
 cd ..
 
 echo --------------------------
+echo Download and install libjpeg 
+echo --------------------------
+
+:: clone and build libjpeg
+git clone https://github.com/libjpeg-turbo/libjpeg-turbo.git libjpeg || GOTO FAILED
+
+cd libjpeg 
+
+cmake -Bbuild -G"Unix Makefiles" ^
+-DCMAKE_TOOLCHAIN_FILE=%NDK%\build\cmake\android.toolchain.cmake ^
+-DANDROID_PLATFORM=android-%API% ^
+-DCMAKE_MAKE_PROGRAM=%NDK%\prebuilt\windows-x86_64\bin\make.exe ^
+-DANDROID_TOOLCHAIN=clang ^
+-DANDROID_ABI=%ABI% ^
+-DCMAKE_BUILD_TYPE=Release ^
+-DCMAKE_PREFIX_PATH=%INSTALL_DIR% ^
+-DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% || GOTO FAILED
+
+cmake --build build --config Release --target install || GOTO FAILED
+
+cd ..
+
+echo --------------------------
 echo Download and install Leptonica 
 echo --------------------------
 
@@ -144,6 +167,8 @@ cmake -Bbuild -G"Unix Makefiles" ^
 -DBUILD_SHARED_LIBS=ON ^
 -DPNG_LIBRARY=%INSTALL_DIR%\lib\libpng.so ^
 -DPNG_PNG_INCLUDE_DIR=%INSTALL_DIR%\include ^
+-DJPEG_LIBRARY=%INSTALL_DIR%\lib\libjpeg.so ^
+-DJPEG_INCLUDE_DIR=%INSTALL_DIR%\include ^
 -DCMAKE_TOOLCHAIN_FILE=%NDK%\build\cmake\android.toolchain.cmake ^
 -DANDROID_PLATFORM=android-%API% ^
 -DCMAKE_MAKE_PROGRAM=%NDK%\prebuilt\windows-x86_64\bin\make.exe ^
