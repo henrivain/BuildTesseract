@@ -1,12 +1,14 @@
 # Building [Tesseract ocr](https://github.com/tesseract-ocr) for Android running processor architectures
 
-27.3.2023
+27.3.2023 (updated 5.4.2023)
 
 Build platform: `Windows 11 64bit`
 
 Build Target: `Android`
 
 Target Architectures: `Arm_v8a (64bit), Arm_v7a (32bit), x86 (32bit), x86_64 (64bit)`
+
+Note: Building with these exact instuctions will cause Tesseract to only support jpeg and png image. You can add additional libraries by following libjepg and libpng steps with these libraries (for example Tif, Gif). These build processes might have small differences.
 
 ## Step 1: Get required tools
 
@@ -152,7 +154,49 @@ cmake --build build --config Release --target install
 cd ..
 ```
 
-## Step 5: Build Leptonica
+## Step 5: Build libjpeg
+
+### Clone libjpeg-turbo to libjpeg folder
+
+```powershell
+git clone https://github.com/libjpeg-turbo/libjpeg-turbo.git libjpeg
+```
+
+### Go inside folder
+
+```powershell
+cd libjpeg
+```
+
+### Run cmake
+
+```powershell
+cmake -Bbuild -G"Unix Makefiles" ^
+-DCMAKE_TOOLCHAIN_FILE=%NDK%\build\cmake\android.toolchain.cmake ^
+-DANDROID_PLATFORM=android-%API% ^
+-DCMAKE_MAKE_PROGRAM=%NDK%\prebuilt\windows-x86_64\bin\make.exe ^
+-DANDROID_TOOLCHAIN=clang ^
+-DANDROID_ABI=%ABI% ^
+-DCMAKE_BUILD_TYPE=Release ^
+-DCMAKE_PREFIX_PATH=%INSTALL_DIR% ^
+-DCMAKE_INSTALL_PREFIX=%INSTALL_DIR%
+```
+
+### Install libjpeg
+
+Install libjpeg to `INSTALL_DIR` using
+
+```powershell
+cmake --build build --config Release --target install
+```
+
+### Go back to root
+
+```powershell
+cd ..
+```
+
+## Step 6: Build Leptonica
 
 ### Clone leptonica repository
 
@@ -199,7 +243,7 @@ cmake --build build --config Release --target install
 cd ..
 ```
 
-## Step 6: Build Google cpu_features
+## Step 7: Build Google cpu_features
 
 This package seems to be missing, so it also needs to be build as a part of Tesseract build process.
 
@@ -243,7 +287,7 @@ cmake --build build --config Release --target install
 cd ..
 ```
 
-## Step 7: Build Tesseract
+## Step 8: Build Tesseract
 
 ### Clone tesseract ocr repository
 
@@ -286,7 +330,7 @@ Install Tesseract to `INSTALL_DIR` using
 cmake --build build --config Release --target install
 ```
 
-## Step 8: Validate results
+## Step 9: Validate results
 
 ### You should now have folder structure like
 
