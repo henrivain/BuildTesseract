@@ -23,6 +23,14 @@ echo and then start loading tools and build.
 SET /P ISCORRECTINPUT="Is information correct? (Y/[N]) >"
 IF /I "%ISCORRECTINPUT%" NEQ "Y" GOTO END
 
+echo ------------------------------
+echo Create result folders
+echo ------------------------------
+
+echo \x86
+echo \x86_64
+echo \arm64-v8a
+echo \arm-v7a
 
 mkdir x86
 mkdir x86_64
@@ -35,7 +43,7 @@ echo ------------------------------
 
 cd x86
 
-..\BuildAndroid x86 || GOTO FAILED
+CALL ..\BuildAndroid x86 || GOTO FAILED
 
 cd ..
 
@@ -66,7 +74,7 @@ echo ------------------------------
 
 cd x86_64
 
-..\BuildAndroid x86_64 || GOTO FAILED
+CALL ..\BuildAndroid x86_64 || GOTO FAILED
 
 cd ..
 
@@ -77,7 +85,7 @@ echo ------------------------------
 
 cd arm64-v8a
 
-..\BuildAndroid arm64-v8a || GOTO FAILED
+CALL ..\BuildAndroid arm64-v8a || GOTO FAILED
 
 cd ..
 
@@ -88,7 +96,7 @@ echo ------------------------------
 
 cd arm-v7a
 
-..\BuildAndroid arm-v7a || GOTO FAILED
+CALL ..\BuildAndroid arm-v7a || GOTO FAILED
 
 cd ..
 
