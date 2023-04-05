@@ -100,6 +100,9 @@ GOTO END
 
 :FAILED
 echo failed
+echo Exit build all.
+EXIT /b 1
 
 :END
 echo Exit build all.
+EXIT /b 0

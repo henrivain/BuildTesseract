@@ -287,9 +287,15 @@ echo --------------------------
 
 @echo off
 GOTO END
+
+
 :FAILED
 echo process failed!
+echo Exit
+EXIT /b 1
 
 :END 
 
 echo Exit
+
+EXIT /b 0
