@@ -13,9 +13,52 @@ setlocal
 
 echo Build Tesseract ocr 
 echo script by Henri Vainio
-:: SET target variables
 echo -------------------------------------------------------------
-echo Path to your root folder should not contain any spaces!
+
+if "%~1"=="" GOTO CONFIGURE
+if "%~1"=="x86" GOTO X86
+if "%~1"=="x86_64" GOTO x86_64
+if "%~1"=="arm64-v8a" GOTO ARM64_V8A
+if "%~1"=="arm-v7a" GOTO ARM_V7A
+
+
+
+:: CONFIGURE X86
+:X86
+SET TARGET=i686-linux-android
+SET API=21
+SET ABI=x86
+GOTO NO_CONFIGURE
+
+
+:: CONFIGURE X86_64
+:x86_64
+SET TARGET=x86_64-linux-android
+SET API=21
+SET ABI=x86_64
+GOTO NO_CONFIGURE
+
+
+:: CONFIGURE ARM64-V8A
+:ARM64_V8A
+SET TARGET=aarch64-linux-android
+SET API=21
+SET ABI=arm64-v8a
+GOTO NO_CONFIGURE
+
+
+:: CONFIGURE ARM-V7A
+:ARM_V7A
+SET TARGET=armv7a-linux-androideabi
+SET API=21
+SET ABI=armeabi-v7a
+GOTO NO_CONFIGURE
+
+
+:: CONFIGURE ASKS FOR USER INPUT
+:CONFIGURE
+
+:: SET target variables
 echo Do you have unzip, curl, git and cmake installed? Are you inside empty folder?
 SET /P ISEMPTY="Y/[N] >"
 IF /I "%ISEMPTY%" NEQ "Y" GOTO END
@@ -27,6 +70,8 @@ SET /P ABI="Give Android ABI >"
 SET /P ISCORRECTINPUT="Is information correct? (Y/[N]) >"
 IF /I "%ISCORRECTINPUT%" NEQ "Y" GOTO END
 
+:: TARGETS ALL SET
+:NO_CONFIGURE
 
 :: CONFIGURE SOME PATHS 
 SET ROOT=%cd%
