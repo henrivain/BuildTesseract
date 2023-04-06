@@ -2,7 +2,7 @@
 :: This script builds tesseract ocr for Android in Windows 11
 :: Unzip, Curl, GIT and Cmake are required to be installed on this build device
 :: You can find available TARGET, ABI and API from BuildingAndroidArchitectures.md
-:: That file can be found on Github repository https://github.com/henrivain/BuildTesseract
+:: Instructions can be found on Github repository https://github.com/henrivain/BuildTesseract
 :: This script was written in 27.3.2023
 :: Build tool versions might have changed and broken the script after writing
 
@@ -12,6 +12,7 @@ setlocal
 
 
 echo Build Tesseract ocr 
+echo for Android platform
 echo script by Henri Vainio
 echo -------------------------------------------------------------
 
@@ -156,9 +157,9 @@ echo Download start might take a while!
 curl -o libpng.zip https://nav.dl.sourceforge.net/project/libpng/libpng16/1.6.39/lpng1639.zip || GOTO FAILED
 unzip libpng.zip || GOTO FAILED
 ren lpng1639 libpng || GOTO FAILED
-cd libpng || GOTO failed
+cd libpng || GOTO FAILED
 
-:: Build libpng
+:: BUILD LIBPNG
 cmake -Bbuild -G"Unix Makefiles" ^
 -DHAVE_LD_VERSION_SCRIPT=OFF ^
 -DCMAKE_TOOLCHAIN_FILE=%NDK%\build\cmake\android.toolchain.cmake ^
@@ -170,7 +171,7 @@ cmake -Bbuild -G"Unix Makefiles" ^
 -DCMAKE_PREFIX_PATH=%INSTALL_DIR% ^
 -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% || GOTO FAILED
 
-:: Install to build folder
+:: INSTALL TO BUILD FOLDER
 cmake --build build --config Release --target install || GOTO FAILED
 
 cd ..
@@ -285,7 +286,6 @@ echo find input in root/build/bin and root/build/lib
 echo --------------------------
 
 
-@echo off
 GOTO END
 
 
