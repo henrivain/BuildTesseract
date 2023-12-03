@@ -122,10 +122,7 @@ echo --------------------------
 echo Build zlib
 echo --------------------------
 
-echo Download zlib
-curl -o zlib.zip https://zlib.net/zlib1213.zip || GOTO FAILED
-unzip zlib.zip || GOTO FAILED
-ren zlib-1.2.13 zlib || GOTO FAILED
+git clone https://github.com/madler/zlib.git zlib || GOTO FAILED
 cd zlib || GOTO FAILED
 
 :: CONFIGURE ZLIB
