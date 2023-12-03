@@ -4,6 +4,7 @@
 :: You can find available TARGET, ABI and API from BuildingAndroidArchitectures.md
 :: Instructions can be found on Github repository https://github.com/henrivain/BuildTesseract
 :: This script was written in 27.3.2023
+:: Last edit with verified successful run 3.12.2023 
 :: Build tool versions might have changed and broken the script after writing
 
 @echo off
@@ -80,22 +81,45 @@ SET INSTALL_DIR=%ROOT%\build
 SET BATCH_DIR=%~dp0
 
 echo --------------------------
+echo Versions tools to be used
+echo --------------------------
+
+SET NDK_VERSION=android-ndk-r26b
+SET PLATFORM_TOOLS_VERSION=platform-tools_r34.0.4-windows
+
+:: Check if NDK version is defined from the outside
+IF "%~2"=="--NDK_V" IF NOT "%~3"=="" (
+    SET NDK_VERSION=%~3
+    echo NDK version defined in command line parameters
+)
+
+:: Check if platform tools version is defined from the outside
+IF "%~4"=="--PT_V" IF NOT "%~5"=="" (
+    SET PLATFORM_TOOLS_VERSION=%~5
+    echo Platform tools version defined in command line parameters
+)
+
+echo Uses NDK version %NDK_VERSION%
+echo Uses Platform tools version %PLATFORM_TOOLS_VERSION%
+
+
+echo --------------------------
 echo Download Tools 
 echo --------------------------
 
 
 :: VALIDATE NDK
 :: FIND OR DOWNLOAD
-SET NDK=%ROOT%\android-ndk-r25c
+SET NDK=%ROOT%\%NDK_VERSION%
 echo batch file at %BATCH_DIR%
-echo Check for NDK at %BATCH_DIR%\android-ndk-r25c
-echo Check for NDK at %cd%\android-ndk-r25c
+echo Check for NDK at %BATCH_DIR%%NDK_VERSION%
+echo Check for NDK at %cd%\%NDK_VERSION%
 
-if exist "%BATCH_DIR%\android-ndk-r25c\"  (
+if exist "%BATCH_DIR%\%NDK_VERSION%\"  (
     :: NDK INSIDE BATCH FILE DIRECTORY, RESET PATH
-    SET NDK=%BATCH_DIR%android-ndk-r25c
-    echo android-ndk-r25c already exist, no need to download.
-) else if exist android-ndk-r25c\ (
+    SET NDK=%BATCH_DIR%%NDK_VERSION%
+    echo %NDK_VERSION% already exist, no need to download.
+) else if exist %NDK_VERSION%\ (
     :: FILE WAS FOUND ELSEWHERE, RESET PATH
     echo NDK exist inside root folder, no need to download.
 ) else (
@@ -104,9 +128,9 @@ if exist "%BATCH_DIR%\android-ndk-r25c\"  (
     echo --------------------------
 
     echo This might take a while
-    curl -o android-ndk-r25c.zip https://dl.google.com/android/repository/android-ndk-r25c-windows.zip || GOTO FAILED
+    curl -o %NDK_VERSION%.zip https://dl.google.com/android/repository/%NDK_VERSION%-windows.zip || GOTO FAILED
 
-    unzip android-ndk-r25c.zip || GOTO FAILED
+    unzip %NDK_VERSION%.zip || GOTO FAILED
 )
 
 echo Check platform-tools location 
@@ -115,7 +139,7 @@ echo Check platform-tools location
 :: FIND OR DOWNLOAD
 if exist "%BATCH_DIR%\platform-tools\" (
     :: PLATFORM-TOOLS INSIDE BATCH FILE DIRECTORY, RESET PATH
-    SET PLATFORM_TOOLS_PATH=%BATCH_DIR%\platform-tools
+    SET PLATFORM_TOOLS=%BATCH_DIR%\platform-tools
     echo platform-tools found inside batch file directory, no need to download.
 ) else if exist platform-tools\ (
     echo platform-tools exist inside root folder, no need to download.
@@ -123,8 +147,8 @@ if exist "%BATCH_DIR%\platform-tools\" (
     echo --------------------------
     echo Download android platform tools
     echo --------------------------
-
-    curl -o platform-tools.zip https://dl.google.com/android/repository/platform-tools_r34.0.1-windows.zip || GOTO FAILED
+    curl -o platform-tools.zip https://dl.google.com/android/repository/%PLATFORM_TOOLS_VERSION%.zip || GOTO FAILED
+    
 
     unzip platform-tools.zip || GOTO FAILED
 )
@@ -138,15 +162,38 @@ echo "Start build"
 echo "Create folder \build"
 mkdir build 
 
-echo platform-tools at %PLATFORM_TOOLS_PATH%
+echo platform-tools at %PLATFORM_TOOLS%
 echo NDK at %NDK%
 
 :: Configure tool paths
 SET MINSDKVERSION=16
 SET TOOLCHAIN=%NDK%\toolchains\llvm\prebuilt\windows-x86_64
-SET PATH=%PATH%;%TOOLCHAIN%\bin;%PLATFORM_TOOLS_PATH%;
+SET PATH=%PATH%;%TOOLCHAIN%\bin;%PLATFORM_TOOLS%;
 SET CXX=%TOOLCHAIN%\bin\%TARGET%%API%-clang++
 SET CC=%TOOLCHAIN%\bin\%TARGET%%API%-clang
+
+
+echo --------------------------
+echo Download and install libtiff 
+echo --------------------------
+
+git clone https://gitlab.com/libtiff/libtiff.git libtiff || GOTO FAILED
+
+cd libtiff 
+
+cmake -Bbuild -G"Unix Makefiles" ^
+-DCMAKE_TOOLCHAIN_FILE=%NDK%\build\cmake\android.toolchain.cmake ^
+-DANDROID_PLATFORM=android-%API% ^
+-DCMAKE_MAKE_PROGRAM=%NDK%\prebuilt\windows-x86_64\bin\make.exe ^
+-DANDROID_TOOLCHAIN=clang ^
+-DANDROID_ABI=%ABI% ^
+-DCMAKE_BUILD_TYPE=Release ^
+-DCMAKE_PREFIX_PATH=%INSTALL_DIR% ^
+-DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% || GOTO FAILED
+
+cmake --build build --config Release --target install || GOTO FAILED
+
+cd ..
 
 echo --------------------------
 echo Download and install libpng 
@@ -154,9 +201,10 @@ echo --------------------------
 
 :: Download libpng from source forge
 echo Download start might take a while!
-curl -o libpng.zip https://nav.dl.sourceforge.net/project/libpng/libpng16/1.6.39/lpng1639.zip || GOTO FAILED
+
+curl -L -o libpng.zip https://sourceforge.net/projects/libpng/files/libpng16/1.6.40/lpng1640.zip/download || GOTO FAILED
 unzip libpng.zip || GOTO FAILED
-ren lpng1639 libpng || GOTO FAILED
+ren lpng1640 libpng || GOTO FAILED
 cd libpng || GOTO FAILED
 
 :: BUILD LIBPNG
@@ -200,6 +248,29 @@ cmake --build build --config Release --target install || GOTO FAILED
 cd ..
 
 echo --------------------------
+echo Download and install openjpeg 
+echo --------------------------
+
+:: clone and build libjpeg
+git clone https://github.com/uclouvain/openjpeg.git libopenjpeg || GOTO FAILED
+
+cd libopenjpeg 
+
+cmake -Bbuild -G"Unix Makefiles" ^
+-DCMAKE_TOOLCHAIN_FILE=%NDK%\build\cmake\android.toolchain.cmake ^
+-DANDROID_PLATFORM=android-%API% ^
+-DCMAKE_MAKE_PROGRAM=%NDK%\prebuilt\windows-x86_64\bin\make.exe ^
+-DANDROID_TOOLCHAIN=clang ^
+-DANDROID_ABI=%ABI% ^
+-DCMAKE_BUILD_TYPE=Release ^
+-DCMAKE_PREFIX_PATH=%INSTALL_DIR% ^
+-DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% || GOTO FAILED
+
+cmake --build build --config Release --target install || GOTO FAILED
+
+cd ..
+
+echo --------------------------
 echo Download and install Leptonica 
 echo --------------------------
 
@@ -216,6 +287,10 @@ cmake -Bbuild -G"Unix Makefiles" ^
 -DPNG_PNG_INCLUDE_DIR=%INSTALL_DIR%\include ^
 -DJPEG_LIBRARY=%INSTALL_DIR%\lib\libjpeg.so ^
 -DJPEG_INCLUDE_DIR=%INSTALL_DIR%\include ^
+-DTIFF_LIBRARY=%INSTALL_DIR%\lib\libtiff.so ^
+-DTIFF_INCLUDE_DIR=%INSTALL_DIR%\include ^
+-DOpenJPEG_DIR=%INSTALL_DIR%\lib\libopenjp2.so ^
+-DOpenJPEG_INCLUDE_DIR=%INSTALL_DIR%\include ^
 -DCMAKE_TOOLCHAIN_FILE=%NDK%\build\cmake\android.toolchain.cmake ^
 -DANDROID_PLATFORM=android-%API% ^
 -DCMAKE_MAKE_PROGRAM=%NDK%\prebuilt\windows-x86_64\bin\make.exe ^
@@ -264,6 +339,8 @@ cmake -Bbuild -G"Unix Makefiles" ^
 -DBUILD_TRAINING_TOOLS=OFF ^
 -DGRAPHICS_DISABLED=ON ^
 -DSW_BUILD=OFF ^
+-DLEPT_TIFF_COMPILE_SUCCESS=0 ^
+-DLEPT_TIFF_RESULT=0 ^
 -DOPENMP_BUILD=OFF ^
 -DBUILD_SHARED_LIBS=ON ^
 -DLeptonica_DIR=%INSTALL_DIR%\lib\cmake\leptonica ^
@@ -277,6 +354,8 @@ cmake -Bbuild -G"Unix Makefiles" ^
 -DCMAKE_PREFIX_PATH=%INSTALL_DIR%;%INSTALL_DIR%\lib;%INSTALL_DIR%\include;%INSTALL_DIR%\lib\cmake ^
 -DCpuFeaturesNdkCompat_DIR=%INSTALL_DIR%\lib\cmake\CpuFeaturesNdkCompat || GOTO FAILED
 
+echo START INSTALLATION
+
 cmake --build build --config Release --target install || GOTO FAILED
 
 :: Finish
@@ -288,11 +367,10 @@ echo --------------------------
 
 GOTO END
 
-
 :FAILED
 echo Failed!
 echo BuildAndroid.bat failed!
-echo Exit, return 1
+echo Exit, return %ERRORLEVEL%
 
 EXIT /b 1
 

@@ -3,6 +3,7 @@
 :: Unzip, Curl, GIT and Cmake are required to be installed on this build device
 :: Instructions can be found on Github repository https://github.com/henrivain/BuildTesseract
 :: This script was written in 5.4.2023
+:: Last updated with verified successful run 3.12.2023
 :: Build tool versions might have changed and broken the script after writing
 
 @echo off
@@ -25,6 +26,14 @@ SET /P ISCORRECTINPUT="Is information correct? (Y/[N]) >"
 IF /I "%ISCORRECTINPUT%" NEQ "Y" GOTO END
 
 echo ------------------------------
+echo Configure tool versions
+echo ------------------------------
+SET NDK_VERSION=android-ndk-r26b
+SET PLATFORM_TOOLS_VERSION=platform-tools_r34.0.4-windows
+
+echo Uses %NDK_VERSION% and %PLATFORM_TOOLS_VERSION%
+
+echo ------------------------------
 echo Create result folders
 echo ------------------------------
 
@@ -44,7 +53,7 @@ echo ------------------------------
 
 cd x86
 
-CALL ..\BuildAndroid x86 || GOTO FAILED
+CALL ..\BuildAndroid x86 --NDK_V %NDK_VERSION% --PT_V %PLATFORM_TOOLS_VERSION% || GOTO FAILED
 
 cd ..
 
@@ -53,12 +62,12 @@ echo Check if tools can be copied
 
 SET BATCH_DIR=%~dp0
 
-if exist "%BATCH_DIR%\android-ndk-r25c\" (
+if exist "%BATCH_DIR%\%NDK_VERSION%\" (
     echo NDK exist inside batch file folder, no need to copy.
 ) else (
-    mkdir android-ndk-r25c
+    mkdir %NDK_VERSION%
     :: Copy ndk to batch file directory
-    xcopy x86\android-ndk-r25c android-ndk-r25c\ /h /i /c /k /e /r /y || echo Cannot copy NDK to root folder, it might already exist in it.
+    xcopy x86\%NDK_VERSION% %NDK_VERSION%\ /h /i /c /k /e /r /y || echo Cannot copy NDK to root folder, it might already exist in it.
 )
 
 if exist "%BATCH_DIR%\platform-tools\" (
@@ -76,7 +85,7 @@ echo ------------------------------
 
 cd x86_64
 
-CALL ..\BuildAndroid x86_64 || GOTO FAILED
+CALL ..\BuildAndroid x86_64 --NDK_V %NDK_VERSION% --PT_V %PLATFORM_TOOLS_VERSION% || GOTO FAILED
 
 cd ..
 
@@ -87,7 +96,7 @@ echo ------------------------------
 
 cd arm64-v8a
 
-CALL ..\BuildAndroid arm64-v8a || GOTO FAILED
+CALL ..\BuildAndroid arm64-v8a --NDK_V %NDK_VERSION% --PT_V %PLATFORM_TOOLS_VERSION% || GOTO FAILED
 
 cd ..
 
@@ -98,7 +107,7 @@ echo ------------------------------
 
 cd arm-v7a
 
-CALL ..\BuildAndroid arm-v7a || GOTO FAILED
+CALL ..\BuildAndroid arm-v7a --NDK_V %NDK_VERSION% --PT_V %PLATFORM_TOOLS_VERSION% || GOTO FAILED
 
 cd ..
 
