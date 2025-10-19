@@ -84,8 +84,8 @@ echo --------------------------
 echo Versions tools to be used
 echo --------------------------
 
-SET NDK_VERSION=android-ndk-r26b
-SET PLATFORM_TOOLS_VERSION=platform-tools_r34.0.4-windows
+SET NDK_VERSION=android-ndk-r29
+SET PLATFORM_TOOLS_VERSION=platform-tools-latest-windows
 
 :: Check if NDK version is defined from the outside
 IF "%~2"=="--NDK_V" IF NOT "%~3"=="" (
@@ -172,29 +172,6 @@ SET PATH=%PATH%;%TOOLCHAIN%\bin;%PLATFORM_TOOLS%;
 SET CXX=%TOOLCHAIN%\bin\%TARGET%%API%-clang++
 SET CC=%TOOLCHAIN%\bin\%TARGET%%API%-clang
 
-
-echo --------------------------
-echo Download and install libtiff 
-echo --------------------------
-
-git clone https://gitlab.com/libtiff/libtiff.git libtiff || GOTO FAILED
-
-cd libtiff 
-
-cmake -Bbuild -G"Unix Makefiles" ^
--DCMAKE_TOOLCHAIN_FILE=%NDK%\build\cmake\android.toolchain.cmake ^
--DANDROID_PLATFORM=android-%API% ^
--DCMAKE_MAKE_PROGRAM=%NDK%\prebuilt\windows-x86_64\bin\make.exe ^
--DANDROID_TOOLCHAIN=clang ^
--DANDROID_ABI=%ABI% ^
--DCMAKE_BUILD_TYPE=Release ^
--DCMAKE_PREFIX_PATH=%INSTALL_DIR% ^
--DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% || GOTO FAILED
-
-cmake --build build --config Release --target install || GOTO FAILED
-
-cd ..
-
 echo --------------------------
 echo Download and install libpng 
 echo --------------------------
@@ -202,9 +179,9 @@ echo --------------------------
 :: Download libpng from source forge
 echo Download start might take a while!
 
-curl -L -o libpng.zip https://sourceforge.net/projects/libpng/files/libpng16/1.6.40/lpng1640.zip/download || GOTO FAILED
+curl -L -o libpng.zip https://sourceforge.net/projects/libpng/files/libpng16/1.6.50/lpng1650.zip/download || GOTO FAILED
 unzip libpng.zip || GOTO FAILED
-ren lpng1640 libpng || GOTO FAILED
+ren lpng1650 libpng || GOTO FAILED
 cd libpng || GOTO FAILED
 
 :: BUILD LIBPNG
@@ -262,6 +239,31 @@ cmake -Bbuild -G"Unix Makefiles" ^
 -DCMAKE_MAKE_PROGRAM=%NDK%\prebuilt\windows-x86_64\bin\make.exe ^
 -DANDROID_TOOLCHAIN=clang ^
 -DANDROID_ABI=%ABI% ^
+-DCMAKE_BUILD_TYPE=Release ^
+-DCMAKE_PREFIX_PATH=%INSTALL_DIR% ^
+-DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% || GOTO FAILED
+
+cmake --build build --config Release --target install || GOTO FAILED
+
+cd ..
+
+
+echo --------------------------
+echo Download and install libtiff 
+echo --------------------------
+
+git clone https://gitlab.com/libtiff/libtiff.git libtiff || GOTO FAILED
+
+cd libtiff 
+
+cmake -Bbuild -G"Unix Makefiles" ^
+-DCMAKE_TOOLCHAIN_FILE=%NDK%\build\cmake\android.toolchain.cmake ^
+-DANDROID_PLATFORM=android-%API% ^
+-DCMAKE_MAKE_PROGRAM=%NDK%\prebuilt\windows-x86_64\bin\make.exe ^
+-DANDROID_TOOLCHAIN=clang ^
+-DANDROID_ABI=%ABI% ^
+-DJPEG_LIBRARY=%INSTALL_DIR%\lib\libjpeg.so ^
+-DJPEG_INCLUDE_DIR=%INSTALL_DIR%\include ^
 -DCMAKE_BUILD_TYPE=Release ^
 -DCMAKE_PREFIX_PATH=%INSTALL_DIR% ^
 -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% || GOTO FAILED
