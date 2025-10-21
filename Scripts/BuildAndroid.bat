@@ -4,7 +4,7 @@
 :: You can find available TARGET, ABI and API from BuildingAndroidArchitectures.md
 :: Instructions can be found on Github repository https://github.com/henrivain/BuildTesseract
 :: This script was written in 27.3.2023
-:: Last edit with verified successful run 3.12.2023 
+:: Last edit with verified successful run 20.10.2025 
 :: Build tool versions might have changed and broken the script after writing
 
 @echo off
@@ -76,16 +76,22 @@ IF /I "%ISCORRECTINPUT%" NEQ "Y" GOTO END
 :NO_CONFIGURE
 
 :: CONFIGURE SOME PATHS 
+
+:: We need to convert back slashes to forward slashes to get rid of any escape charactes
+:: Thats why we have ":\=/"
 SET ROOT=%cd%
-SET INSTALL_DIR=%ROOT%\build
+SET ROOT=%ROOT:\=/%
+SET INSTALL_DIR=%ROOT%/build
+
 SET BATCH_DIR=%~dp0
+SET BATCH_DIR=%BATCH_DIR:\=/%
 
 echo --------------------------
 echo Versions tools to be used
 echo --------------------------
 
-SET NDK_VERSION=android-ndk-r26b
-SET PLATFORM_TOOLS_VERSION=platform-tools_r34.0.4-windows
+SET NDK_VERSION=android-ndk-r29
+SET PLATFORM_TOOLS_VERSION=platform-tools-latest-windows
 
 :: Check if NDK version is defined from the outside
 IF "%~2"=="--NDK_V" IF NOT "%~3"=="" (
@@ -110,16 +116,16 @@ echo --------------------------
 
 :: VALIDATE NDK
 :: FIND OR DOWNLOAD
-SET NDK=%ROOT%\%NDK_VERSION%
+SET NDK=%ROOT%/%NDK_VERSION%
 echo batch file at %BATCH_DIR%
 echo Check for NDK at %BATCH_DIR%%NDK_VERSION%
-echo Check for NDK at %cd%\%NDK_VERSION%
+echo Check for NDK at %cd%/%NDK_VERSION%
 
-if exist "%BATCH_DIR%\%NDK_VERSION%\"  (
+if exist "%BATCH_DIR%/%NDK_VERSION%/"  (
     :: NDK INSIDE BATCH FILE DIRECTORY, RESET PATH
     SET NDK=%BATCH_DIR%%NDK_VERSION%
     echo %NDK_VERSION% already exist, no need to download.
-) else if exist %NDK_VERSION%\ (
+) else if exist %NDK_VERSION%/ (
     :: FILE WAS FOUND ELSEWHERE, RESET PATH
     echo NDK exist inside root folder, no need to download.
 ) else (
@@ -137,11 +143,11 @@ echo Check platform-tools location
 
 :: VALIDATE PLATFORM-TOOLS
 :: FIND OR DOWNLOAD
-if exist "%BATCH_DIR%\platform-tools\" (
+if exist "%BATCH_DIR%/platform-tools/" (
     :: PLATFORM-TOOLS INSIDE BATCH FILE DIRECTORY, RESET PATH
-    SET PLATFORM_TOOLS=%BATCH_DIR%\platform-tools
+    SET PLATFORM_TOOLS=%BATCH_DIR%/platform-tools
     echo platform-tools found inside batch file directory, no need to download.
-) else if exist platform-tools\ (
+) else if exist platform-tools/ (
     echo platform-tools exist inside root folder, no need to download.
 ) else (
     echo --------------------------
@@ -157,9 +163,19 @@ echo --------------------------
 echo Configure build
 echo --------------------------
 
+:: Remove MSYS2 influence from compiler include/link paths
+set "CPATH="
+set "C_INCLUDE_PATH="
+set "CPLUS_INCLUDE_PATH="
+set "LIBRARY_PATH="
+set "PKG_CONFIG_PATH="
+set "PKG_CONFIG_LIBDIR="
+set "INCLUDE="
+set "LIB="
+
 :: Create build folder
 echo "Start build"
-echo "Create folder \build"
+echo "Create folder /build"
 mkdir build 
 
 echo platform-tools at %PLATFORM_TOOLS%
@@ -167,33 +183,10 @@ echo NDK at %NDK%
 
 :: Configure tool paths
 SET MINSDKVERSION=16
-SET TOOLCHAIN=%NDK%\toolchains\llvm\prebuilt\windows-x86_64
-SET PATH=%PATH%;%TOOLCHAIN%\bin;%PLATFORM_TOOLS%;
-SET CXX=%TOOLCHAIN%\bin\%TARGET%%API%-clang++
-SET CC=%TOOLCHAIN%\bin\%TARGET%%API%-clang
-
-
-echo --------------------------
-echo Download and install libtiff 
-echo --------------------------
-
-git clone https://gitlab.com/libtiff/libtiff.git libtiff || GOTO FAILED
-
-cd libtiff 
-
-cmake -Bbuild -G"Unix Makefiles" ^
--DCMAKE_TOOLCHAIN_FILE=%NDK%\build\cmake\android.toolchain.cmake ^
--DANDROID_PLATFORM=android-%API% ^
--DCMAKE_MAKE_PROGRAM=%NDK%\prebuilt\windows-x86_64\bin\make.exe ^
--DANDROID_TOOLCHAIN=clang ^
--DANDROID_ABI=%ABI% ^
--DCMAKE_BUILD_TYPE=Release ^
--DCMAKE_PREFIX_PATH=%INSTALL_DIR% ^
--DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% || GOTO FAILED
-
-cmake --build build --config Release --target install || GOTO FAILED
-
-cd ..
+SET TOOLCHAIN=%NDK%/toolchains/llvm/prebuilt/windows-x86_64
+SET PATH=%PATH%;%TOOLCHAIN%/bin;%PLATFORM_TOOLS%;
+SET CXX=%TOOLCHAIN%/bin/%TARGET%%API%-clang++
+SET CC=%TOOLCHAIN%/bin/%TARGET%%API%-clang
 
 echo --------------------------
 echo Download and install libpng 
@@ -202,17 +195,17 @@ echo --------------------------
 :: Download libpng from source forge
 echo Download start might take a while!
 
-curl -L -o libpng.zip https://sourceforge.net/projects/libpng/files/libpng16/1.6.40/lpng1640.zip/download || GOTO FAILED
+curl -L -o libpng.zip https://sourceforge.net/projects/libpng/files/libpng16/1.6.50/lpng1650.zip/download || GOTO FAILED
 unzip libpng.zip || GOTO FAILED
-ren lpng1640 libpng || GOTO FAILED
+ren lpng1650 libpng || GOTO FAILED
 cd libpng || GOTO FAILED
 
 :: BUILD LIBPNG
 cmake -Bbuild -G"Unix Makefiles" ^
 -DHAVE_LD_VERSION_SCRIPT=OFF ^
--DCMAKE_TOOLCHAIN_FILE=%NDK%\build\cmake\android.toolchain.cmake ^
+-DCMAKE_TOOLCHAIN_FILE=%NDK%/build/cmake/android.toolchain.cmake ^
 -DANDROID_PLATFORM=android-%API% ^
--DCMAKE_MAKE_PROGRAM=%NDK%\prebuilt\windows-x86_64\bin\make.exe ^
+-DCMAKE_MAKE_PROGRAM=%NDK%/prebuilt/windows-x86_64/bin/make.exe ^
 -DANDROID_TOOLCHAIN=clang ^
 -DANDROID_ABI=%ABI% ^
 -DCMAKE_BUILD_TYPE=Release ^
@@ -234,9 +227,9 @@ git clone https://github.com/libjpeg-turbo/libjpeg-turbo.git libjpeg || GOTO FAI
 cd libjpeg 
 
 cmake -Bbuild -G"Unix Makefiles" ^
--DCMAKE_TOOLCHAIN_FILE=%NDK%\build\cmake\android.toolchain.cmake ^
+-DCMAKE_TOOLCHAIN_FILE=%NDK%/build/cmake/android.toolchain.cmake ^
 -DANDROID_PLATFORM=android-%API% ^
--DCMAKE_MAKE_PROGRAM=%NDK%\prebuilt\windows-x86_64\bin\make.exe ^
+-DCMAKE_MAKE_PROGRAM=%NDK%/prebuilt/windows-x86_64/bin/make.exe ^
 -DANDROID_TOOLCHAIN=clang ^
 -DANDROID_ABI=%ABI% ^
 -DCMAKE_BUILD_TYPE=Release ^
@@ -257,14 +250,42 @@ git clone https://github.com/uclouvain/openjpeg.git libopenjpeg || GOTO FAILED
 cd libopenjpeg 
 
 cmake -Bbuild -G"Unix Makefiles" ^
--DCMAKE_TOOLCHAIN_FILE=%NDK%\build\cmake\android.toolchain.cmake ^
+-DCMAKE_TOOLCHAIN_FILE=%NDK%/build/cmake/android.toolchain.cmake ^
 -DANDROID_PLATFORM=android-%API% ^
--DCMAKE_MAKE_PROGRAM=%NDK%\prebuilt\windows-x86_64\bin\make.exe ^
+-DCMAKE_MAKE_PROGRAM=%NDK%/prebuilt/windows-x86_64/bin/make.exe ^
 -DANDROID_TOOLCHAIN=clang ^
 -DANDROID_ABI=%ABI% ^
 -DCMAKE_BUILD_TYPE=Release ^
 -DCMAKE_PREFIX_PATH=%INSTALL_DIR% ^
 -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% || GOTO FAILED
+
+cmake --build build --config Release --target install || GOTO FAILED
+
+cd ..
+
+
+echo --------------------------
+echo Download and install libtiff 
+echo --------------------------
+
+git clone https://gitlab.com/libtiff/libtiff.git libtiff || GOTO FAILED
+
+cd libtiff 
+
+cmake -Bbuild -G"Unix Makefiles" ^
+-DCMAKE_TOOLCHAIN_FILE=%NDK%/build/cmake/android.toolchain.cmake ^
+-DANDROID_PLATFORM=android-%API% ^
+-DCMAKE_MAKE_PROGRAM=%NDK%/prebuilt/windows-x86_64/bin/make.exe ^
+-DANDROID_TOOLCHAIN=clang ^
+-DANDROID_ABI=%ABI% ^
+-DJPEG_LIBRARY=%INSTALL_DIR%/lib/libjpeg.so ^
+-DJPEG_INCLUDE_DIR=%INSTALL_DIR%/include ^
+-DCMAKE_BUILD_TYPE=Release ^
+-DCMAKE_PREFIX_PATH=%INSTALL_DIR% ^
+-DHAVE_LD_VERSION_SCRIPT=OFF ^
+-DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% || GOTO FAILED
+
+:: DHAVE_LD_VERSION_SCRIPT to disable wide character support on android as it is not supported
 
 cmake --build build --config Release --target install || GOTO FAILED
 
@@ -283,22 +304,22 @@ cmake -Bbuild -G"Unix Makefiles" ^
 -DBUILD_PROG=OFF ^
 -DSW_BUILD=OFF ^
 -DBUILD_SHARED_LIBS=ON ^
--DPNG_LIBRARY=%INSTALL_DIR%\lib\libpng.so ^
--DPNG_PNG_INCLUDE_DIR=%INSTALL_DIR%\include ^
--DJPEG_LIBRARY=%INSTALL_DIR%\lib\libjpeg.so ^
--DJPEG_INCLUDE_DIR=%INSTALL_DIR%\include ^
--DTIFF_LIBRARY=%INSTALL_DIR%\lib\libtiff.so ^
--DTIFF_INCLUDE_DIR=%INSTALL_DIR%\include ^
--DOpenJPEG_DIR=%INSTALL_DIR%\lib\libopenjp2.so ^
--DOpenJPEG_INCLUDE_DIR=%INSTALL_DIR%\include ^
--DCMAKE_TOOLCHAIN_FILE=%NDK%\build\cmake\android.toolchain.cmake ^
+-DPNG_LIBRARY=%INSTALL_DIR%/lib/libpng.so ^
+-DPNG_PNG_INCLUDE_DIR=%INSTALL_DIR%/include ^
+-DJPEG_LIBRARY=%INSTALL_DIR%/lib/libjpeg.so ^
+-DJPEG_INCLUDE_DIR=%INSTALL_DIR%/include ^
+-DTIFF_LIBRARY=%INSTALL_DIR%/lib/libtiff.so ^
+-DTIFF_INCLUDE_DIR=%INSTALL_DIR%/include ^
+-DOpenJPEG_DIR=%INSTALL_DIR%/lib/libopenjp2.so ^
+-DOpenJPEG_INCLUDE_DIR=%INSTALL_DIR%/include ^
+-DCMAKE_TOOLCHAIN_FILE=%NDK%/build/cmake/android.toolchain.cmake ^
 -DANDROID_PLATFORM=android-%API% ^
--DCMAKE_MAKE_PROGRAM=%NDK%\prebuilt\windows-x86_64\bin\make.exe ^
+-DCMAKE_MAKE_PROGRAM=%NDK%/prebuilt/windows-x86_64/bin/make.exe ^
 -DANDROID_TOOLCHAIN=clang ^
 -DANDROID_ABI=%ABI% ^
 -DCMAKE_BUILD_TYPE=Release ^
 -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% ^
--DCMAKE_PREFIX_PATH=%INSTALL_DIR%;%INSTALL_DIR%\lib;%INSTALL_DIR%\include;%INSTALL_DIR%\lib\cmake || GOTO FAILED
+-DCMAKE_PREFIX_PATH=%INSTALL_DIR%;%INSTALL_DIR%/lib;%INSTALL_DIR%/include;%INSTALL_DIR%/lib/cmake || GOTO FAILED
 
 cmake --build build --config Release --target install || GOTO FAILED
 
@@ -313,9 +334,9 @@ git clone https://github.com/google/cpu_features.git || GOTO FAILED
 cd cpu_features
 
 cmake -Bbuild -G"Unix Makefiles" ^
--DCMAKE_TOOLCHAIN_FILE=%NDK%\build\cmake\android.toolchain.cmake ^
+-DCMAKE_TOOLCHAIN_FILE=%NDK%/build/cmake/android.toolchain.cmake ^
 -DANDROID_PLATFORM=android-%API% ^
--DCMAKE_MAKE_PROGRAM=%NDK%\prebuilt\windows-x86_64\bin\make.exe ^
+-DCMAKE_MAKE_PROGRAM=%NDK%/prebuilt/windows-x86_64/bin/make.exe ^
 -DANDROID_TOOLCHAIN=clang ^
 -DANDROID_ABI=%ABI% ^
 -DCMAKE_BUILD_TYPE=Release ^
@@ -343,16 +364,19 @@ cmake -Bbuild -G"Unix Makefiles" ^
 -DLEPT_TIFF_RESULT=0 ^
 -DOPENMP_BUILD=OFF ^
 -DBUILD_SHARED_LIBS=ON ^
--DLeptonica_DIR=%INSTALL_DIR%\lib\cmake\leptonica ^
--DCMAKE_TOOLCHAIN_FILE=%NDK%\build\cmake\android.toolchain.cmake ^
+-DLeptonica_DIR=%INSTALL_DIR%/lib/cmake/leptonica ^
+-DCMAKE_TOOLCHAIN_FILE=%NDK%/build/cmake/android.toolchain.cmake ^
 -DANDROID_PLATFORM=android-%API% ^
--DCMAKE_MAKE_PROGRAM=%NDK%\prebuilt\windows-x86_64\bin\make.exe ^
+-DCMAKE_MAKE_PROGRAM=%NDK%/prebuilt/windows-x86_64/bin/make.exe ^
 -DANDROID_TOOLCHAIN=clang ^
 -DANDROID_ABI=%ABI% ^
 -DCMAKE_BUILD_TYPE=Release ^
+-DENABLE_PRECOMPILED_HEADERS=OFF ^
 -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% ^
--DCMAKE_PREFIX_PATH=%INSTALL_DIR%;%INSTALL_DIR%\lib;%INSTALL_DIR%\include;%INSTALL_DIR%\lib\cmake ^
--DCpuFeaturesNdkCompat_DIR=%INSTALL_DIR%\lib\cmake\CpuFeaturesNdkCompat || GOTO FAILED
+-DCMAKE_PREFIX_PATH=%INSTALL_DIR%;%INSTALL_DIR%/lib;%INSTALL_DIR%/include;%INSTALL_DIR%/lib/cmake ^
+-DCpuFeaturesNdkCompat_DIR=%INSTALL_DIR%/lib/cmake/CpuFeaturesNdkCompat || GOTO FAILED
+
+:: DENABLE_PRECOMPILED_HEADERS = Disable preincluded headers (like vector and such), so invalid toolchain does not give its wrong headers
 
 echo START INSTALLATION
 

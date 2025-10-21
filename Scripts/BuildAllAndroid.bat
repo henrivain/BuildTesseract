@@ -1,9 +1,9 @@
-:: Copyright Henri Vainio 2023
+:: Copyright Henri Vainio 2025
 :: This script builds tesseract ocr for Android in Windows 11
 :: Unzip, Curl, GIT and Cmake are required to be installed on this build device
 :: Instructions can be found on Github repository https://github.com/henrivain/BuildTesseract
-:: This script was written in 5.4.2023
-:: Last updated with verified successful run 3.12.2023
+:: This script was originally written in 5.4.2023
+:: Last updated with verified successful run 19.10.2025
 :: Build tool versions might have changed and broken the script after writing
 
 @echo off
@@ -28,8 +28,8 @@ IF /I "%ISCORRECTINPUT%" NEQ "Y" GOTO END
 echo ------------------------------
 echo Configure tool versions
 echo ------------------------------
-SET NDK_VERSION=android-ndk-r26b
-SET PLATFORM_TOOLS_VERSION=platform-tools_r34.0.4-windows
+SET NDK_VERSION=android-ndk-r29
+SET PLATFORM_TOOLS_VERSION=platform-tools-latest-windows
 
 echo Uses %NDK_VERSION% and %PLATFORM_TOOLS_VERSION%
 
