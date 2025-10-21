@@ -28,7 +28,7 @@ This repository contains information about how to build [Tesseract ocr](https://
 ## Available precompiled binaries
 
 All can be found inside `Binaries` folder
-All are build using newest available (No release) code from repositories. Newest Tesseract release at the time of writing is 5.3.0 (28.3.2023).
+All are build using newest available (No release) code from repositories. Newest Tesseract release at the time of writing is 5.5.1 (21.10.2025).
 
 > Android Arm64_v8a  
 > Android Arm_v7a  
