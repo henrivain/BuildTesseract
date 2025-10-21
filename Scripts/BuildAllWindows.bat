@@ -1,8 +1,9 @@
-:: Copyright Henri Vainio 2023
+:: Copyright Henri Vainio 2025
 :: This script builds tesseract ocr for Windows
 :: Expects Unzip, Curl, GIT, Cmake and Visual studio 2022 to be installed on build device
 :: Instructions can be found on Github repository https://github.com/henrivain/BuildTesseract
-:: This script was written in 6.4.2023
+:: This script originally was written in 6.4.2023
+:: Last verified successfull run was 21.10.2025 
 :: Build tool versions might have changed and broken the script after writing
 
 @echo off

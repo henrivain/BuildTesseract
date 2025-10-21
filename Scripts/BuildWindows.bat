@@ -1,8 +1,9 @@
-:: Copyright Henri Vainio 2023
+:: Copyright Henri Vainio 2025
 :: This script builds tesseract ocr for Windows
 :: Expects Unzip, Curl, GIT, Cmake and Visual studio to be installed on build device
 :: Instructions can be found on Github repository https://github.com/henrivain/BuildTesseract
-:: This script was written in 6.4.2023
+:: This script originally was written in 6.4.2023
+:: Last verified successfull run was 21.10.2025 
 :: Build tool versions might have changed and broken the script after writing
 
 
@@ -143,9 +144,9 @@ echo --------------------------
 
 :: DOWNLOAD LIBPNG FROM SOURCE FORGE
 echo Download start might take a while!
-curl -o libpng.zip https://nav.dl.sourceforge.net/project/libpng/libpng16/1.6.39/lpng1639.zip || GOTO FAILED
+curl -L -o libpng.zip https://sourceforge.net/projects/libpng/files/libpng16/1.6.50/lpng1650.zip/download || GOTO FAILED
 unzip libpng.zip || GOTO FAILED
-ren lpng1639 libpng || GOTO FAILED
+ren lpng1650 libpng || GOTO FAILED
 cd libpng || GOTO FAILED
 
 :: CONFIGURE LIBPNG
@@ -180,6 +181,28 @@ cmake --build build --config Release --target install || GOTO FAILED
 
 cd ..
 
+
+echo --------------------------
+echo Download and install libtiff 
+echo --------------------------
+
+git clone https://gitlab.com/libtiff/libtiff.git libtiff || GOTO FAILED
+
+cd libtiff 
+
+:: CONFIGURE LIBTIFF
+echo configure libtiff
+cmake -Bbuild -DCMAKE_BUILD_TYPE=Release ^
+-Djpeg12=OFF -DHAVE_JPEGTURBO_DUAL_MODE_8_12=OFF -DJPEG_DUAL_MODE_8_12=OFF ^
+-DCMAKE_PREFIX_PATH=%INSTALL_DIR% -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% || GOTO FAILED
+
+:: BUILD AND INSTALL LIBJPEG TO INSTALL_DIR
+echo build and install libtiff
+cmake --build build --config Release --target install || GOTO FAILED
+
+cd ..
+
+
 echo --------------------------
 echo Download and install leptonica
 echo --------------------------
@@ -208,7 +231,7 @@ echo --------------------------
 git clone https://github.com/tesseract-ocr/tesseract tesseract
 cd tesseract
 
-:: CONFIGURE LEPTONICA
+:: CONFIGURE TESSERACT
 echo configure tesseract
 cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% ^
 -DCMAKE_PREFIX_PATH=%INSTALL_DIR% ^
@@ -217,7 +240,7 @@ cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% ^
 -DSW_BUILD=OFF ^
 -DOPENMP_BUILD=OFF -DBUILD_SHARED_LIBS=ON || GOTO FAILED
 
-:: BUILD AND INSTALL LEPTONICA TO INSTALL_DIR
+:: BUILD AND INSTALL TESSERACT TO INSTALL_DIR
 echo build and install tesseract
 cmake --build build --config Release --target install || GOTO FAILED
 
